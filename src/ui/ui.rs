@@ -15,7 +15,7 @@ pub fn main() {
 	// }
 
 
-	for i in 0..100 {
+	for i in 0..110 {
 		println!("{i}: \x1b[1;{i};{i}m{} \x1b[0m", "TEST");
 	}
 
