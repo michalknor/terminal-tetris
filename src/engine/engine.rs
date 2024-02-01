@@ -1,13 +1,15 @@
-struct Game {
-
+pub struct Game {
+	board: [[i32; 10]; 20]
 }
 
 impl Game {
-	fn new() -> Game {
-		Game {}
+	pub fn new() -> Game {
+		Game {
+			board: [[0; 10]; 20]
+		}
 	}
-}
 
-pub fn create_game() -> [[i32; 10]; 20] {
-	[[0; 10]; 20]
+	pub fn get_board(&self) -> &[[i32; 10]; 20] {
+		&self.board
+	}
 }

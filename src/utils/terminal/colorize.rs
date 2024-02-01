@@ -1,5 +1,5 @@
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
-pub enum TextColors {
+pub enum Colors {
 	WHITE,
 	GRAY,
 	RED,
@@ -11,23 +11,41 @@ pub enum TextColors {
 }
 
 
-impl TextColors {
-    fn get_code(&self) -> i32 {
+impl Colors {
+    fn get_code_for_text(&self) -> i32 {
         match self {
-            TextColors::WHITE => 29,
-			TextColors::GRAY => 30,
-			TextColors::RED => 31,
-			TextColors::GREEN => 32,
-			TextColors::YELLOW => 33,
-			TextColors::BLUE => 34,
-			TextColors::PINK => 35,
-			TextColors::CYAN => 36,
+            Colors::WHITE => 29,
+			Colors::GRAY => 30,
+			Colors::RED => 31,
+			Colors::GREEN => 32,
+			Colors::YELLOW => 33,
+			Colors::BLUE => 34,
+			Colors::PINK => 35,
+			Colors::CYAN => 36,
+        }
+    }
+
+    fn get_code_for_background(&self) -> i32 {
+        match self {
+			Colors::GRAY => 100,
+			Colors::RED => 41,
+			Colors::GREEN => 42,
+			Colors::YELLOW => 43,
+			Colors::BLUE => 44,
+			Colors::PINK => 45,
+			Colors::CYAN => 46,
+            Colors::WHITE => 47,
         }
     }
 }
 
 
 
-pub fn colorize(text: &str, text_color: TextColors) -> String {
-	format!("\x1b[{}m{} \x1b[0m", text_color.get_code(), text)
+pub fn colorizeText(text: String, text_color: Colors) -> String {
+	format!("\x1b[{}m{}\x1b[0m", text_color.get_code_for_text(), text)
+}
+
+
+pub fn colorizeBackground(text: String, text_color: Colors) -> String {
+	format!("\x1b[{}m{}\x1b[0m", text_color.get_code_for_background(), text)
 }
