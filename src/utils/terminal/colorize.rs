@@ -41,11 +41,11 @@ impl Colors {
 
 
 
-pub fn colorizeText(text: String, text_color: Colors) -> String {
+pub fn colorize_text(text: String, text_color: Colors) -> String {
 	format!("\x1b[{}m{}\x1b[0m", text_color.get_code_for_text(), text)
 }
 
 
-pub fn colorizeBackground(text: String, text_color: Colors) -> String {
+pub fn colorize_background(text: String, text_color: Colors) -> String {
 	format!("\x1b[{}m{}\x1b[0m", text_color.get_code_for_background(), text)
 }
