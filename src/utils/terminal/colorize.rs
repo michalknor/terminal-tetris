@@ -27,6 +27,7 @@ impl Colors {
 
     fn get_code_for_background(&self) -> i32 {
         match self {
+            Colors::WHITE => 47,
 			Colors::GRAY => 100,
 			Colors::RED => 41,
 			Colors::GREEN => 42,
@@ -34,7 +35,6 @@ impl Colors {
 			Colors::BLUE => 44,
 			Colors::PINK => 45,
 			Colors::CYAN => 46,
-            Colors::WHITE => 47,
         }
     }
 }
