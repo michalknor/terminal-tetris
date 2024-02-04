@@ -41,15 +41,16 @@ impl UI {
 
 	pub async fn run(&mut self) -> Result<(), std::io::Error> {
 		loop {
-			self.run_game()?;
+			self.game.update()?;
+			self.render_game()?;
 			tokio::time::sleep(self.game.get_delay()).await
 		}
 	}
 
-	fn run_game(&mut self) -> Result<(), std::io::Error> {
+	fn render_game(&mut self) -> Result<(), std::io::Error> {
 		for (i, it) in self.game.get_board().iter().enumerate() {
 			self.stdout
-				.execute(crossterm::cursor::MoveTo(0, i as u16))?;
+				.execute(crossterm::cursor::MoveTo(0, 20-i as u16))?;
 			for it2 in it {
 				// print!("\x1b[1;{}m  \x1b[0m", rand::thread_rng().gen_range(41..48));
 				print!("{}", it2.get_text());

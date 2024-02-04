@@ -1,11 +1,9 @@
-use crate::ui;
-
 use crossterm::event::KeyCode;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use std::time::Duration;
+use std::{thread::current, time::Duration};
 use std::thread;
 
-use super::tetromino::TetrominoType;
+use super::tetromino::{Tetromino, TetrominoType};
 
 pub enum KeyPressed {
 	ROTATE,
@@ -16,55 +14,101 @@ pub enum KeyPressed {
 }
 
 pub struct Game {
-	board: [[TetrominoType; 10]; 20],
+	board_without_current: [[TetrominoType; 10]; 20],
+	board_with_current: [[TetrominoType; 10]; 20],
 	delay: Duration,
 	rx_key_event: UnboundedReceiver<KeyCode>,
+	bag: Vec<Tetromino>,
+	current_tetronimo: Tetromino,
 }
 
 impl Game {
 	pub fn new(rx_key_event: UnboundedReceiver<KeyCode>) -> Self {
-		let mut board = [[TetrominoType::None; 10]; 20];
-		board[0][0] = TetrominoType::I;
-		board[0][1] = TetrominoType::O;
-		board[0][2] = TetrominoType::J;
-		board[0][3] = TetrominoType::L;
-		board[0][4] = TetrominoType::S;
-		board[0][5] = TetrominoType::Z;
-		board[0][6] = TetrominoType::T;
-		let delay = Duration::from_millis(1000);
+		let board = [[TetrominoType::None; 10]; 20];
+		let delay = Duration::from_millis(100);
+		let mut bag = Tetromino::new_bag();
+		let current_tetronimo = bag.pop().unwrap();
 		Self {
-			board,
+			board_without_current: board,
+			board_with_current: board,
 			delay,
 			rx_key_event,
+			bag,
+			current_tetronimo,
 		}
 	}
 
 	pub fn get_board(&self) -> [[TetrominoType; 10]; 20] {
-		self.board
+		self.board_with_current
 	}
 
 	pub fn get_delay(&self) -> Duration {
 		self.delay
 	}
 
-	fn key_press_listener(&mut self) -> KeyPressed {
-        match self.rx_key_event.try_recv() {
-            Ok(key) => {
-				match key {
-					KeyCode::Up => KeyPressed::ROTATE,
-					KeyCode::Left => KeyPressed::LEFT,
-					KeyCode::Right => KeyPressed::RIGHT,
-					KeyCode::Down => KeyPressed::DOWN,
-					_ => KeyPressed::NONE
-				}
-            }
-            Err(_e) => KeyPressed::NONE,
-        }
-    }
+	pub fn update(&mut self) -> Result<(), std::io::Error> {
+		if self.can_fall() {
+			self.fall();
+			return Ok(())
+		}
+		
+		self.place_current_tetronimo();
+		self.draw_from_bag();
 
-	fn run(&mut self) -> Result<(), std::io::Error> {
-		let delay = Duration::from_millis(1000);
+		Ok(())
+	}
 
-        Ok(())
-    }
+	fn can_fall(&self) -> bool {
+		for (x, y) in self.current_tetronimo.get_blocks() {
+			if *y >= 20 {
+				continue;
+			}
+			if *y <= 0 {
+				return false;
+			}
+			if self.board_without_current[*y-1][*x] != TetrominoType::None {
+				return false;
+			}
+		}
+
+		true
+	}
+
+	fn fall(&mut self) {
+		self.current_tetronimo.fall();
+		self.board_with_current = self.board_without_current.clone();
+
+		for (x, y) in self.current_tetronimo.get_blocks() {
+			if *y >= 20 {
+				continue;
+			}
+			self.board_with_current[*y][*x] = self.current_tetronimo.get_tetromino_type();
+		}
+	}
+
+	fn place_current_tetronimo(&mut self) {
+		self.board_without_current = self.board_with_current.clone();
+	}
+
+	fn draw_from_bag(&mut self) {
+		self.current_tetronimo = self.bag.pop().unwrap();
+		if self.bag.len() == 0 {
+			self.bag = Tetromino::new_bag();
+		}
+	}
+
+	// fn key_press_listener(&mut self) -> KeyPressed {
+    //     match self.rx_key_event.try_recv() {
+    //         Ok(key) => {
+	// 			match key {
+	// 				KeyCode::Up => KeyPressed::ROTATE,
+	// 				KeyCode::Left => KeyPressed::LEFT,
+	// 				KeyCode::Right => KeyPressed::RIGHT,
+	// 				KeyCode::Down => KeyPressed::DOWN,
+	// 				_ => KeyPressed::NONE
+	// 			}
+    //         }
+    //         Err(_e) => KeyPressed::NONE,
+    //     }
+    // }
 }
