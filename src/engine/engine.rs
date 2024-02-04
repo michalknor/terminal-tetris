@@ -1,9 +1,15 @@
 use crossterm::event::KeyCode;
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use std::{thread::current, time::Duration};
-use std::thread;
 
 use super::tetromino::{Tetromino, TetrominoType};
+
+
+pub const WIDTH: u8 = 10;
+pub const HEIGHT: u8 = 20;
+
 
 pub enum KeyPressed {
 	ROTATE,
@@ -18,6 +24,7 @@ pub struct Game {
 	board_with_current: [[TetrominoType; 10]; 20],
 	delay: Duration,
 	rx_key_event: UnboundedReceiver<KeyCode>,
+	rng: StdRng,
 	bag: Vec<Tetromino>,
 	current_tetronimo: Tetromino,
 }
@@ -25,14 +32,17 @@ pub struct Game {
 impl Game {
 	pub fn new(rx_key_event: UnboundedReceiver<KeyCode>) -> Self {
 		let board = [[TetrominoType::None; 10]; 20];
-		let delay = Duration::from_millis(100);
-		let mut bag = Tetromino::new_bag();
+		let delay = Duration::from_millis(1000);
+        let mut rng = StdRng::seed_from_u64(1);
+		let mut bag = Tetromino::new_bag(&mut rng);
 		let current_tetronimo = bag.pop().unwrap();
+
 		Self {
 			board_without_current: board,
 			board_with_current: board,
 			delay,
 			rx_key_event,
+			rng,
 			bag,
 			current_tetronimo,
 		}
@@ -60,13 +70,13 @@ impl Game {
 
 	fn can_fall(&self) -> bool {
 		for (x, y) in self.current_tetronimo.get_blocks() {
-			if *y >= 20 {
+			if y >= 20 {
 				continue;
 			}
-			if *y <= 0 {
+			if y <= 0 {
 				return false;
 			}
-			if self.board_without_current[*y-1][*x] != TetrominoType::None {
+			if self.board_without_current[y-1][x] != TetrominoType::None {
 				return false;
 			}
 		}
@@ -79,10 +89,10 @@ impl Game {
 		self.board_with_current = self.board_without_current.clone();
 
 		for (x, y) in self.current_tetronimo.get_blocks() {
-			if *y >= 20 {
+			if y >= 20 {
 				continue;
 			}
-			self.board_with_current[*y][*x] = self.current_tetronimo.get_tetromino_type();
+			self.board_with_current[y][x] = self.current_tetronimo.get_tetromino_type();
 		}
 	}
 
@@ -93,8 +103,9 @@ impl Game {
 	fn draw_from_bag(&mut self) {
 		self.current_tetronimo = self.bag.pop().unwrap();
 		if self.bag.len() == 0 {
-			self.bag = Tetromino::new_bag();
+			self.bag = Tetromino::new_bag(&mut self.rng);
 		}
+		self.fall();
 	}
 
 	// fn key_press_listener(&mut self) -> KeyPressed {
