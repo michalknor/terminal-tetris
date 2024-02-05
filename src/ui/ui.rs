@@ -1,9 +1,6 @@
 use std::io::{self, Write};
 
-use std::{
-    borrow::Cow,
-    io::{stdout, Stdout},
-};
+use std::io::{stdout, Stdout};
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, terminal, ExecutableCommand};

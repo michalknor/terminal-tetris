@@ -1,5 +1,5 @@
 use std::io::{self, Write};
-use tokio::sync::mpsc::unbounded_channel;
+// use tokio::sync::mpsc::unbounded_channel;
 
 mod engine;
 mod ui;
@@ -29,6 +29,6 @@ async fn main() -> Result<(), std::io::Error> {
 
 
 fn hide_cursor() {
-    print!("\x1B[?25l"); // Send escape code to hide cursor
+    print!("\x1B[?25l");
     io::stdout().flush().unwrap();
 }
