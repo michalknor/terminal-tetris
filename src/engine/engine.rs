@@ -1,8 +1,6 @@
-use crossterm::event::KeyCode;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use std::{thread::current, time::Duration};
+use std::time::Duration;
 
 use super::tetromino::{Tetromino, TetrominoType};
 

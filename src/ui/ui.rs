@@ -1,13 +1,11 @@
 use std::io::{self, Write};
 
 use std::io::{stdout, Stdout};
-use std::time::Duration;
-use crossterm::event::{read, KeyCode};
+use crossterm::event::KeyCode;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, terminal, ExecutableCommand};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use crossterm::event::{poll, Event};
 
 use crate::utils::terminal::colorize::{colorize_background, Colors};
 use crate::engine::engine::Game;
