@@ -23,14 +23,13 @@ pub struct Game {
 	board_without_current: [[TetrominoType; 10]; 20],
 	board_with_current: [[TetrominoType; 10]; 20],
 	delay: Duration,
-	rx_key_event: UnboundedReceiver<KeyCode>,
 	rng: StdRng,
 	bag: Vec<Tetromino>,
 	current_tetronimo: Tetromino,
 }
 
 impl Game {
-	pub fn new(rx_key_event: UnboundedReceiver<KeyCode>) -> Self {
+	pub fn new() -> Self {
 		let board = [[TetrominoType::None; 10]; 20];
 		let delay = Duration::from_millis(1000);
         let mut rng = StdRng::seed_from_u64(1);
@@ -41,7 +40,6 @@ impl Game {
 			board_without_current: board,
 			board_with_current: board,
 			delay,
-			rx_key_event,
 			rng,
 			bag,
 			current_tetronimo,
@@ -68,6 +66,54 @@ impl Game {
 		Ok(())
 	}
 
+	pub fn move_left(&mut self) {
+		if !self.can_move_left() {
+			return;
+		}
+		self.current_tetronimo.move_left();
+		self.update_board();
+	}
+
+	pub fn move_right(&mut self) {
+		if !self.can_move_right() {
+			return;
+		}
+		self.current_tetronimo.move_right();
+		self.update_board();
+	}
+
+	fn can_move_left(&mut self) -> bool {
+		for (x, y) in self.current_tetronimo.get_blocks() {
+			if y >= 20 {
+				continue;
+			}
+			if x == 0 {
+				return false;
+			}
+			if self.board_without_current[y][x-1] != TetrominoType::None {
+				return false;
+			}
+		}
+
+		true
+	}
+
+	fn can_move_right(&mut self) -> bool {
+		for (x, y) in self.current_tetronimo.get_blocks() {
+			if y >= 20 {
+				continue;
+			}
+			if x == 10-1 {
+				return false;
+			}
+			if self.board_without_current[y][x+1] != TetrominoType::None {
+				return false;
+			}
+		}
+
+		true
+	}
+
 	fn can_fall(&self) -> bool {
 		for (x, y) in self.current_tetronimo.get_blocks() {
 			if y >= 20 {
@@ -86,6 +132,10 @@ impl Game {
 
 	fn fall(&mut self) {
 		self.current_tetronimo.fall();
+		self.update_board();
+	}
+
+	fn update_board(&mut self) {
 		self.board_with_current = self.board_without_current.clone();
 
 		for (x, y) in self.current_tetronimo.get_blocks() {

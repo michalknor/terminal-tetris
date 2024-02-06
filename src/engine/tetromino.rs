@@ -106,4 +106,16 @@ impl Tetromino {
             self.blocks[i] = (x, y-1);
         }
     }
+
+	pub fn move_left(&mut self) {
+		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
+            self.blocks[i] = (x-1, y);
+        }
+	}
+
+	pub fn move_right(&mut self) {
+		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
+            self.blocks[i] = (x+1, y);
+        }
+	}
 }

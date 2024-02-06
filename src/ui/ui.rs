@@ -1,22 +1,37 @@
 use std::io::{self, Write};
 
 use std::io::{stdout, Stdout};
+use std::time::Duration;
+use crossterm::event::{read, KeyCode};
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, terminal, ExecutableCommand};
-use tokio::sync::mpsc::unbounded_channel;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use crossterm::event::{poll, Event};
 
 use crate::utils::terminal::colorize::{colorize_background, Colors};
 use crate::engine::engine::Game;
 
+#[derive(Debug)]
+pub enum SnakeGameState {
+    SnakeDied,
+    Quit,
+}
+
 pub struct UI {
 	stdout: Stdout,
 	game: Game,
+    rx_key_event: UnboundedReceiver<KeyCode>,
+    tx_game_state: UnboundedSender<SnakeGameState>,
+	a: u64,
 }
 
 
 impl UI {
-    pub fn new() -> Result<Self, std::io::Error> {
+    pub fn new(
+        rx_key_event: UnboundedReceiver<KeyCode>,
+        tx_game_state: UnboundedSender<SnakeGameState>,
+	) -> Result<Self, std::io::Error> {
         let mut stdout = stdout();
 		
         enable_raw_mode()?;
@@ -26,18 +41,49 @@ impl UI {
             .execute(cursor::Hide)?
             .execute(cursor::EnableBlinking)?;
 
-		let (tx_key_event, rx_key_event) = unbounded_channel();
+		
+		let game = Game::new();
 
-		let game = Game::new(rx_key_event);
+        Ok(
+			Self {
+				stdout,
+				game,
+				rx_key_event,
+				tx_game_state,
+				a: 1,
+			}
+		)
+    }
 
-        Ok(Self {stdout, game})
+	fn listen_for_key_press(&mut self) {
+        match self.rx_key_event.try_recv() {
+            Ok(key) => {
+                match key {
+					KeyCode::Left => {
+						self.a += 1;
+						println!("{}", self.a);
+						self.game.move_left()
+					},
+					KeyCode::Right => self.game.move_right(),
+					_ => return
+                }
+            }
+            Err(_e) => return,
+        }
     }
 
 	pub async fn run(&mut self) -> Result<(), std::io::Error> {
 		self.render_corners()?;
 		loop {
+			// if poll(Duration::from_millis(1)).unwrap() {
+			// 	if let Event::Key(key_event) = read().unwrap() {
+			// 		println!("key: {:?}, {:?}", key_event.code, key_event.kind);
+			// 	}
+			// }
+
 			self.game.update()?;
 			self.render_board()?;
+			self.listen_for_key_press();
 		
 			io::stdout().flush().unwrap();
 
