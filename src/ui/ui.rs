@@ -8,7 +8,7 @@ use crossterm::{cursor, terminal, ExecutableCommand};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 
 use crate::utils::terminal::colorize::{colorize_background, Colors};
-use crate::engine::engine::Game;
+use crate::engine::engine::{Game, KeyPressed};
 
 #[derive(Debug)]
 pub enum SnakeGameState {
@@ -51,35 +51,27 @@ impl UI {
 		)
     }
 
-	fn listen_for_key_press(&mut self) {
+	fn listen_for_key_press(&mut self) -> KeyPressed {
         match self.rx_key_event.try_recv() {
             Ok(key) => {
                 match key {
-					KeyCode::Left => self.game.move_left(),
-					KeyCode::Right => self.game.move_right(),
-					KeyCode::Down => {self.game.fall();},
-					_ => return
+					KeyCode::Left => KeyPressed::LEFT,
+					KeyCode::Right => KeyPressed::RIGHT,
+					KeyCode::Down => KeyPressed::DOWN,
+					_ => KeyPressed::NONE
                 }
             }
-            Err(_e) => return,
+            Err(_e) => KeyPressed::NONE,
         }
     }
 
 	pub async fn run(&mut self) -> Result<(), std::io::Error> {
 		self.render_corners()?;
-		let mut a: u8 = 0;
+		
 		loop {
-			// if poll(Duration::from_millis(1)).unwrap() {
-			// 	if let Event::Key(key_event) = read().unwrap() {
-			// 		println!("key: {:?}, {:?}", key_event.code, key_event.kind);
-			// 	}
-			// }
-			a = (a + 1) % 60;
-			if a % 60 == 0 {
-				self.game.update()?;
-			}
+			let key_pressed = self.listen_for_key_press();
+			self.game.update(key_pressed)?;
 			self.render_board()?;
-			self.listen_for_key_press();
 		
 			io::stdout().flush().unwrap();
 

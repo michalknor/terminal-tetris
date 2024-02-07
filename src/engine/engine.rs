@@ -24,6 +24,8 @@ pub struct Game {
 	rng: StdRng,
 	bag: Vec<Tetromino>,
 	current_tetronimo: Tetromino,
+	fall_speed: f64,
+	fall_progress: f64
 }
 
 impl Game {
@@ -33,6 +35,8 @@ impl Game {
         let mut rng = StdRng::seed_from_u64(1);
 		let mut bag = Tetromino::new_bag(&mut rng);
 		let current_tetronimo = bag.pop().unwrap();
+		let fall_speed: f64 = 0.01667;
+		let fall_progress: f64 = 0.0;
 
 		Self {
 			board_without_current: board,
@@ -41,6 +45,8 @@ impl Game {
 			rng,
 			bag,
 			current_tetronimo,
+			fall_speed,
+			fall_progress,
 		}
 	}
 
@@ -52,7 +58,23 @@ impl Game {
 		self.delay
 	}
 
-	pub fn update(&mut self) -> Result<(), std::io::Error> {
+	pub fn update(&mut self, key_pressed: KeyPressed) -> Result<(), std::io::Error> {
+		self.fall_progress += self.fall_speed;
+
+		match key_pressed {
+			KeyPressed::RIGHT => self.move_right(),
+			KeyPressed::LEFT => self.move_left(),
+			KeyPressed::DOWN => {self.fall();},
+			KeyPressed::ROTATE => self.move_right(),
+			KeyPressed::NONE => {},
+		}
+
+		if self.fall_progress < 1.0 {
+			return Ok(())
+		}
+
+		self.fall_progress -= 1.0;
+		
 		if self.fall() {
 			return Ok(())
 		}
