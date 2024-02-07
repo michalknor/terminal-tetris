@@ -21,7 +21,6 @@ pub struct UI {
 	game: Game,
     rx_key_event: UnboundedReceiver<KeyCode>,
     tx_game_state: UnboundedSender<SnakeGameState>,
-	a: u64,
 }
 
 
@@ -48,7 +47,6 @@ impl UI {
 				game,
 				rx_key_event,
 				tx_game_state,
-				a: 1,
 			}
 		)
     }
@@ -57,12 +55,9 @@ impl UI {
         match self.rx_key_event.try_recv() {
             Ok(key) => {
                 match key {
-					KeyCode::Left => {
-						self.a += 1;
-						println!("{}", self.a);
-						self.game.move_left()
-					},
+					KeyCode::Left => self.game.move_left(),
 					KeyCode::Right => self.game.move_right(),
+					KeyCode::Down => {self.game.fall();},
 					_ => return
                 }
             }
@@ -72,20 +67,23 @@ impl UI {
 
 	pub async fn run(&mut self) -> Result<(), std::io::Error> {
 		self.render_corners()?;
+		let mut a: u8 = 0;
 		loop {
 			// if poll(Duration::from_millis(1)).unwrap() {
 			// 	if let Event::Key(key_event) = read().unwrap() {
 			// 		println!("key: {:?}, {:?}", key_event.code, key_event.kind);
 			// 	}
 			// }
-
-			self.game.update()?;
+			a = (a + 1) % 60;
+			if a % 60 == 0 {
+				self.game.update()?;
+			}
 			self.render_board()?;
 			self.listen_for_key_press();
 		
 			io::stdout().flush().unwrap();
 
-			tokio::time::sleep(self.game.get_delay()).await
+			tokio::time::sleep(self.game.get_delay()/60).await
 		}
 
 		// Ok(())

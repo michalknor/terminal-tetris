@@ -53,8 +53,7 @@ impl Game {
 	}
 
 	pub fn update(&mut self) -> Result<(), std::io::Error> {
-		if self.can_fall() {
-			self.fall();
+		if self.fall() {
 			return Ok(())
 		}
 		
@@ -82,11 +81,11 @@ impl Game {
 
 	fn can_move_left(&mut self) -> bool {
 		for (x, y) in self.current_tetronimo.get_blocks() {
-			if y >= 20 {
-				continue;
-			}
 			if x == 0 {
 				return false;
+			}
+			if y >= 20 {
+				continue;
 			}
 			if self.board_without_current[y][x-1] != TetrominoType::None {
 				return false;
@@ -98,11 +97,11 @@ impl Game {
 
 	fn can_move_right(&mut self) -> bool {
 		for (x, y) in self.current_tetronimo.get_blocks() {
-			if y >= 20 {
-				continue;
-			}
 			if x == 10-1 {
 				return false;
+			}
+			if y >= 20 {
+				continue;
 			}
 			if self.board_without_current[y][x+1] != TetrominoType::None {
 				return false;
@@ -128,9 +127,13 @@ impl Game {
 		true
 	}
 
-	fn fall(&mut self) {
+	pub fn fall(&mut self) -> bool {
+		if !self.can_fall() {
+			return false;
+		}
 		self.current_tetronimo.fall();
 		self.update_board();
+		true
 	}
 
 	fn update_board(&mut self) {
@@ -155,19 +158,4 @@ impl Game {
 		}
 		self.fall();
 	}
-
-	// fn key_press_listener(&mut self) -> KeyPressed {
-    //     match self.rx_key_event.try_recv() {
-    //         Ok(key) => {
-	// 			match key {
-	// 				KeyCode::Up => KeyPressed::ROTATE,
-	// 				KeyCode::Left => KeyPressed::LEFT,
-	// 				KeyCode::Right => KeyPressed::RIGHT,
-	// 				KeyCode::Down => KeyPressed::DOWN,
-	// 				_ => KeyPressed::NONE
-	// 			}
-    //         }
-    //         Err(_e) => KeyPressed::NONE,
-    //     }
-    // }
 }
