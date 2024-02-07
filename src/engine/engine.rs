@@ -37,7 +37,7 @@ impl Game {
 		let mut bag = Tetromino::new_bag(&mut rng);
 		let current_tetronimo = bag.pop().unwrap();
 		let fall_speed: f64 = 0.01667;
-		let fall_progress: f64 = 0.0;
+		let fall_progress: f64 = 1.0;
 
 		Self {
 			board_without_current: board,
@@ -75,7 +75,7 @@ impl Game {
 			return Ok(())
 		}
 
-		self.fall_progress -= 1.0;
+		self.fall_progress = 0.0;
 		
 		if self.fall() {
 			return Ok(())
