@@ -10,10 +10,11 @@ pub const HEIGHT: u8 = 20;
 
 
 pub enum KeyPressed {
-	ROTATE,
 	LEFT,
 	RIGHT,
 	DOWN,
+	ROTATE_LEFT,
+	ROTATE_RIGHT,
 	NONE,
 }
 
@@ -62,10 +63,11 @@ impl Game {
 		self.fall_progress += self.fall_speed;
 
 		match key_pressed {
-			KeyPressed::RIGHT => self.move_right(),
 			KeyPressed::LEFT => self.move_left(),
+			KeyPressed::RIGHT => self.move_right(),
 			KeyPressed::DOWN => {self.fall();},
-			KeyPressed::ROTATE => self.move_right(),
+			KeyPressed::ROTATE_LEFT => self.rotate_left(),
+			KeyPressed::ROTATE_RIGHT => self.rotate_right(),
 			KeyPressed::NONE => {},
 		}
 
@@ -179,5 +181,13 @@ impl Game {
 			self.bag = Tetromino::new_bag(&mut self.rng);
 		}
 		self.fall();
+	}
+
+	fn rotate_left(&mut self) {
+		self.current_tetronimo.rotate_left();
+	}
+
+	fn rotate_right(&mut self) {
+		self.current_tetronimo.rotate_right();
 	}
 }

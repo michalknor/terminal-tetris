@@ -101,12 +101,6 @@ impl Tetromino {
         self.tetromino_type
     }
 
-    pub fn fall(&mut self) {
-        for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
-            self.blocks[i] = (x, y-1);
-        }
-    }
-
 	pub fn move_left(&mut self) {
 		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
             self.blocks[i] = (x-1, y);
@@ -114,6 +108,24 @@ impl Tetromino {
 	}
 
 	pub fn move_right(&mut self) {
+		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
+            self.blocks[i] = (x+1, y);
+        }
+	}
+
+    pub fn fall(&mut self) {
+        for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
+            self.blocks[i] = (x, y-1);
+        }
+    }
+
+	pub fn rotate_left(&mut self) {
+		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
+            self.blocks[i] = (x+1, y);
+        }
+	}
+
+	pub fn rotate_right(&mut self) {
 		for (i, &(x, y)) in self.blocks.clone().iter().enumerate() {
             self.blocks[i] = (x+1, y);
         }
