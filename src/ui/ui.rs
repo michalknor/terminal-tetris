@@ -58,6 +58,8 @@ impl UI {
 					KeyCode::Left => KeyPressed::LEFT,
 					KeyCode::Right => KeyPressed::RIGHT,
 					KeyCode::Down => KeyPressed::DOWN,
+					KeyCode::Char('a') => KeyPressed::ROTATE_LEFT,
+					KeyCode::Char('d') => KeyPressed::ROTATE_RIGHT,
 					_ => KeyPressed::NONE
                 }
             }
@@ -77,8 +79,6 @@ impl UI {
 
 			tokio::time::sleep(self.game.get_delay()/60).await
 		}
-
-		// Ok(())
 	}
 
 	fn render_board(&mut self) -> Result<(), std::io::Error> {

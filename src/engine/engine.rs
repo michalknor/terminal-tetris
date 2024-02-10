@@ -111,7 +111,7 @@ impl Game {
 			if y >= 20 {
 				continue;
 			}
-			if self.board_without_current[y][x-1] != TetrominoType::None {
+			if self.board_without_current[y as usize][x as usize - 1] != TetrominoType::None {
 				return false;
 			}
 		}
@@ -127,7 +127,7 @@ impl Game {
 			if y >= 20 {
 				continue;
 			}
-			if self.board_without_current[y][x+1] != TetrominoType::None {
+			if self.board_without_current[y as usize][x as usize + 1] != TetrominoType::None {
 				return false;
 			}
 		}
@@ -143,7 +143,7 @@ impl Game {
 			if y <= 0 {
 				return false;
 			}
-			if self.board_without_current[y-1][x] != TetrominoType::None {
+			if self.board_without_current[y as usize - 1][x as usize] != TetrominoType::None {
 				return false;
 			}
 		}
@@ -167,7 +167,7 @@ impl Game {
 			if y >= 20 {
 				continue;
 			}
-			self.board_with_current[y][x] = self.current_tetronimo.get_tetromino_type();
+			self.board_with_current[y as usize][x as usize] = self.current_tetronimo.get_tetromino_type();
 		}
 	}
 
@@ -185,9 +185,41 @@ impl Game {
 
 	fn rotate_left(&mut self) {
 		self.current_tetronimo.rotate_left();
+		if self.is_current_tetronimo_valid() {
+			self.update_board();
+			return;
+		}
+		self.current_tetronimo.rotate_right();
 	}
 
 	fn rotate_right(&mut self) {
 		self.current_tetronimo.rotate_right();
+		if self.is_current_tetronimo_valid() {
+			self.update_board();
+			return;
+		}
+		self.current_tetronimo.rotate_left();
+	}
+
+	fn is_current_tetronimo_valid(&self) -> bool {
+		for (x, y) in self.current_tetronimo.get_blocks() {
+			if y >= 20 {
+				continue;
+			}
+			if y < 0 {
+				return false;
+			}
+			if x >= 10 {
+				return false;
+			}
+			if x < 0 {
+				return false;
+			}
+			if self.board_without_current[y as usize][x as usize] != TetrominoType::None {
+				return false;
+			}
+		}
+
+		true
 	}
 }
