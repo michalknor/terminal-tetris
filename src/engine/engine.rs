@@ -222,4 +222,8 @@ impl Game {
 
 		true
 	}
+
+	pub fn get_next_tetronimo(&mut self) -> TetrominoType {
+		self.bag[self.bag.len() - 1].get_tetromino_type()
+	}
 }

@@ -32,18 +32,14 @@ pub async fn play_theme() -> Result<(), std::io::Error> {
 }
 
 fn play_sound(frequency: f64, duration_ms: u64) {
-    // Create an audio output stream
     let (_stream, stream_handle) = OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
 
     sink.set_volume(0.1);
 
-    // Generate a sine wave with the specified frequency
     let source = SineWave::new(frequency as u32);
 
-    // Add the generated sound to the sink
     sink.append(source);
 
-    // Sleep to let the sound play for the specified duration
     thread::sleep(Duration::from_millis(duration_ms));
 }

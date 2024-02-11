@@ -1,17 +1,17 @@
-use crate::{engine::tetromino::TetrominoType, utils::terminal::colorize::{colorize_background, Colors}};
+use crate::{engine::tetromino::TetrominoType, utils::terminal::colorize::Color};
 
 
 impl TetrominoType {
-    pub fn get_text(&self) -> String {
+    pub fn get_color(&self) -> Color {
         match self {
-            Self::I => colorize_background(&"  ".to_string(), Colors::CYAN),
-            Self::O => colorize_background(&"  ".to_string(), Colors::YELLOW),
-            Self::T => colorize_background(&"  ".to_string(), Colors::PINK),
-            Self::S => colorize_background(&"  ".to_string(), Colors::GREEN),
-            Self::Z => colorize_background(&"  ".to_string(), Colors::RED),
-            Self::J => colorize_background(&"  ".to_string(), Colors::BLUE),
-            Self::L => colorize_background(&"  ".to_string(), Colors::GRAY),
-            Self::None => "  ".to_string(),
+            Self::I => Color::CYAN,
+            Self::O => Color::YELLOW,
+            Self::T => Color::PINK,
+            Self::S => Color::GREEN,
+            Self::Z => Color::RED,
+            Self::J => Color::BLUE,
+            Self::L => Color::GRAY,
+            Self::None => Color::NONE,
         }
     }
 }
