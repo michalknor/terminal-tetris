@@ -65,7 +65,11 @@ impl Game {
 		match key_pressed {
 			KeyPressed::LEFT => self.move_left(),
 			KeyPressed::RIGHT => self.move_right(),
-			KeyPressed::DOWN => {self.fall();},
+			KeyPressed::DOWN => {
+				if !self.fall() {
+					self.fall_progress = 1.0;
+				}
+			},
 			KeyPressed::ROTATE_LEFT => self.rotate_left(),
 			KeyPressed::ROTATE_RIGHT => self.rotate_right(),
 			KeyPressed::NONE => {},
