@@ -147,7 +147,22 @@ impl UI {
 
 	fn render_next_tetronimo(&mut self) -> Result<(), std::io::Error> {
 		let next_tetronimo = self.game.get_next_tetronimo();
-		let next_tetronimo_block = colorize_background(&"  ".to_string(), next_tetronimo.get_color());
+		let next_tetronimo_block = colorize_background(&"  ".to_string(), next_tetronimo.get_tetromino_type().get_color());
+		let next_tetronimo_blocks = next_tetronimo.get_blocks();
+
+
+		for i in 0..4 {
+			self.stdout
+				.execute(crossterm::cursor::MoveTo(3+20+2+2+2+2, (20-14+3-4+1+i) as u16))?;
+			for j in 0..4 {
+				if next_tetronimo_blocks.contains(&(j+3, -i+22)) {
+					print!("{}", next_tetronimo_block);
+				}
+				else {
+					print!("  ");
+				}
+			}
+		}
 
 		Ok(())
 	}
