@@ -84,7 +84,8 @@ impl Game {
 		if self.fall() {
 			return Ok(())
 		}
-		
+
+		self.clear_rows();
 		self.place_current_tetronimo();
 		self.draw_from_bag();
 
@@ -229,5 +230,36 @@ impl Game {
 
 	pub fn get_next_tetronimo(&mut self) -> &Tetromino {
 		&self.bag[self.bag.len() - 1]
+	}
+
+	fn clear_rows(&mut self) {
+		let mut cleared_rows: Vec<usize> = Vec::new();
+
+		'loop_rows: for (i, row) in self.board_with_current.iter().enumerate() {
+			for block in row {
+				if *block == TetrominoType::None {
+					continue 'loop_rows;
+				}
+			}
+			cleared_rows.push(i);
+		}
+		cleared_rows.push(19);
+
+		let mut previous = 0;
+		for (index, cleared_row) in cleared_rows.iter().enumerate() {
+			/*
+			clear
+			dont
+			clear
+			dont
+			dont
+			 */
+			for i in previous..*cleared_row {
+				self.board_with_current[i] = self.board_with_current[i+index];
+			}
+			previous = *cleared_row
+		}
+		
+		
 	}
 }
