@@ -5,8 +5,8 @@ use std::time::Duration;
 use super::tetromino::{Tetromino, TetrominoType};
 
 
-pub const WIDTH: u8 = 10;
-pub const HEIGHT: u8 = 20;
+pub const WIDTH: usize = 10;
+pub const HEIGHT: usize = 20;
 
 
 pub enum KeyPressed {
@@ -85,8 +85,8 @@ impl Game {
 			return Ok(())
 		}
 
-		self.clear_rows();
 		self.place_current_tetronimo();
+		self.clear_rows();
 		self.draw_from_bag();
 
 		Ok(())
@@ -235,7 +235,7 @@ impl Game {
 	fn clear_rows(&mut self) {
 		let mut cleared_rows: Vec<usize> = Vec::new();
 
-		'loop_rows: for (i, row) in self.board_with_current.iter().enumerate() {
+		'loop_rows: for (i, row) in self.board_without_current.iter().enumerate() {
 			for block in row {
 				if *block == TetrominoType::None {
 					continue 'loop_rows;
@@ -243,23 +243,22 @@ impl Game {
 			}
 			cleared_rows.push(i);
 		}
-		cleared_rows.push(19);
 
-		let mut previous = 0;
-		for (index, cleared_row) in cleared_rows.iter().enumerate() {
-			/*
-			clear
-			dont
-			clear
-			dont
-			dont
-			 */
-			for i in previous..*cleared_row {
-				self.board_with_current[i] = self.board_with_current[i+index];
-			}
-			previous = *cleared_row
+		if cleared_rows.is_empty() {
+			return;
 		}
-		
-		
+
+		let mut offset = 0;
+
+		for i in 0..self.board_without_current.len() {
+			while cleared_rows.contains(&(i + offset)) {
+				offset += 1;
+			}
+			if i + offset >= HEIGHT {
+				self.board_without_current[i] = [TetrominoType::None; WIDTH];
+				return;
+			}
+			self.board_without_current[i] = self.board_without_current[i + offset].clone();
+		}
 	}
 }
