@@ -226,7 +226,7 @@ impl Tetromino {
 
         let mut bag_shuffled: Vec<Tetromino> = Vec::new();
 
-        while bag.len() != 0 {
+        while !bag.is_empty() {
             let tetromino: Tetromino = bag.remove(rng.gen_range(0..bag.len()));
             bag_shuffled.push(tetromino);
         }

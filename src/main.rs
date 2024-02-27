@@ -2,7 +2,6 @@ mod engine;
 mod ui;
 mod utils;
 
-use std::io::{self, Write};
 use tokio::sync::mpsc::unbounded_channel;
 use utils::terminal::cursor::hide_cursor;
 

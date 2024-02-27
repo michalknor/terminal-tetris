@@ -171,7 +171,7 @@ impl UI {
 		let horizontal_edge_line: String = "  ".repeat(10+2);
 		
 		self.stdout
-			.execute(crossterm::cursor::MoveTo(3, 3 as u16))?;
+			.execute(crossterm::cursor::MoveTo(3, 3_u16))?;
 		print!("{}", colorize_background(&horizontal_edge_line, Color::WHITE));
 
 		for i in 0..20 {
@@ -185,7 +185,7 @@ impl UI {
 		}
 		
 		self.stdout
-			.execute(crossterm::cursor::MoveTo(3, 3+20+1 as u16))?;
+			.execute(crossterm::cursor::MoveTo(3, 3+20+1_u16))?;
 		print!("{}", colorize_background(&horizontal_edge_line, Color::WHITE));
 
 		Ok(())

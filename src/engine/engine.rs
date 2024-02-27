@@ -166,7 +166,7 @@ impl Game {
 	}
 
 	fn update_board(&mut self) {
-		self.board_with_current = self.board_without_current.clone();
+		self.board_with_current = self.board_without_current;
 
 		for (x, y) in self.current_tetronimo.get_blocks() {
 			if y >= 20 {
@@ -177,12 +177,12 @@ impl Game {
 	}
 
 	fn place_current_tetronimo(&mut self) {
-		self.board_without_current = self.board_with_current.clone();
+		self.board_without_current = self.board_with_current;
 	}
 
 	fn draw_from_bag(&mut self) {
 		self.current_tetronimo = self.bag.pop().unwrap();
-		if self.bag.len() == 0 {
+		if self.bag.is_empty() {
 			self.bag = Tetromino::new_bag(&mut self.rng);
 		}
 		self.fall();
@@ -258,7 +258,7 @@ impl Game {
 				self.board_without_current[i] = [TetrominoType::None; WIDTH];
 				return;
 			}
-			self.board_without_current[i] = self.board_without_current[i + offset].clone();
+			self.board_without_current[i] = self.board_without_current[i + offset];
 		}
 	}
 }
